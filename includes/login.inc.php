@@ -5,17 +5,25 @@ if($_SERVER["REQUEST_METHOD"] === "POST"){
     $pwd = $_POST["pwd"];
 
     try {
-        require_once dbh.inc.php;
-        require_once 'login_model.inc.php';
-        require_once 'login_controller.inc.php';
+        require_once 'dbh.inc.php';
+        require_once 'login.model.inc.php';
+        require_once 'login.controller.inc.php';
 
         // Error handler
         $errors = [];
 
-        if(is_input_empty($username, $pwd, $email)){
+        if(is_input_empty($username, $pwd)){
             $errors["empty_input"] = "Fill in all fields!";
         }
-    
+
+        $result = get_user($pdo, $username);
+
+        if(is_username_wrong($result)){
+             $errors["login_incorrect"] = "incorrect login info!";
+        }
+        if(!is_username_wrong($result) && is_password_wrong($pwd, $result["pwd"])){
+             $errors["login_incorrect"] = "incorrect login info!";
+        }
         
         require_once   'config_session.inc.php';
 
